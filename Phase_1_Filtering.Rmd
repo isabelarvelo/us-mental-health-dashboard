@@ -1,0 +1,206 @@
+---
+title: 'Phase 1: Survey Objects'
+author: "Isabel Arvelo"
+date: "2022-09-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(survey)
+library(ggsurvey)
+options( survey.lonely.psu = "adjust" )
+```
+
+
+**NSDUH**
+
+```{r}
+NSDUH_Phase1 <- readRDS("Phase0_NSDUH.rds")
+```
+
+```{r}
+#Adult Subset 
+NSDUH_Phase1_adults <- NSDUH_Phase1[NSDUH_Phase1$catage > 1, ]
+```
+
+```{r}
+#Adult Survey Object
+NSDUH_survey_adults <- svydesign(id = ~verep, strata = ~VESTRQ1Q4_C, nest = TRUE, weights = ~ANALWTQ1Q4_C, data = NSDUH_Phase1_adults)
+```
+
+```{r}
+#All Obs Survey Object 
+NSDUH_survey <- svydesign(id = ~verep, strata = ~VESTRQ1Q4_C, nest = TRUE, weights = ~ANALWTQ1Q4_C, data = NSDUH_Phase1)
+```
+
+```{r}
+#This variable can be used to calculate unweighted and weighted population sizes
+NSDUH_survey<-	update(one = 1 ,	NSDUH_survey)
+NSDUH_survey_adults <-	update(one = 1 ,	NSDUH_survey_adults)
+```
+
+
+```{r}
+unwtd.count( ~one , NSDUH_survey )							# total valid cases
+svyby( ~one , ~catage , NSDUH_survey , unwtd.count )		# by age group
+svyby( ~one , ~irsex , NSDUH_survey , unwtd.count )		# by sex
+svyby( ~one , ~NEWRACE2 , NSDUH_survey , unwtd.count )		# by race/ethnicity
+```
+
+```{r}
+svyby( ~one , ~MHSUTK_U , NSDUH_survey_adults , unwtd.count )
+```
+
+
+```{r}
+#Weighted Counts - matches published numbers 
+svytotal( ~one ,NSDUH_survey )							     # total valid cases
+svyby( ~one , ~catage , NSDUH_survey , svytotal )			# by age group
+svyby( ~one , ~irsex , NSDUH_survey, svytotal )			# by sex
+svyby( ~one , ~NEWRACE2 , NSDUH_survey, svytotal )		# by race/ethnicity
+```
+
+
+```{r}
+svymean(~MHSUTK_U , NSDUH_survey_adults)	
+```
+
+```{r}
+svymean(~spdmon , NSDUH_survey_adults)	
+```
+
+```{r}
+save(NSDUH_survey_adults, file = "~/NSDUH_survey_adults.RData")
+save(NSDUH_survey, file = "~/NSDUH_survey.RData")
+```
+
+```{r}
+save(NSDUH_survey_adults, file = "~/Desktop/Independent Study/PrelimApp/data/NSDUH_survey_adults.RData")
+```
+
+
+
+
+#BRFSS 
+
+```{r}
+BRFSS_Phase1 <- readRDS("Phase0_BRFSS_Survey.rds")
+
+BRFSS_Phase1 <- BRFSS_Phase1 %>% rename(ststr = '_STSTR')  %>% rename(llcpwt = '_LLCPWT')
+```
+
+```{r}
+BRFSS_survey_all <- svydesign(id = ~1, 
+                              strata = ~ststr, 
+                              weights = ~llcpwt, 
+                              data = BRFSS_Phase1)
+```
+
+
+
+```{r}
+BRFSS_survey_all$variables <- BRFSS_survey_all$variables %>%
+                                  rename( X_STATE = "_STATE", 
+                                          IMPRACE = "_IMPRACE", 
+                                          AGE_G = "_AGE_G", 
+                                          EDUCAG = "_EDUCAG", 
+                                          HLTHPLN = "_HLTHPLN")
+
+```
+
+
+
+```{r}
+save(BRFSS_survey_all, file = "~/Desktop/Independent Study/PrelimApp/data/BRFSS_survey_all.RData")
+```
+
+
+
+
+
+
+
+
+
+**Attempting Raking** 
+
+margins 6 and 7 were collapsed
+
+Race/ethnicity in margin 6 was collapsed to non-Hispanic White and Other for males; non-Hispanic White, non-Hispanic Black, and Other for females. In margin seven, race/ethnicity was collapsed to non-Hispanic White and Other.
+
+1: Sex by Age - ACS Data 
+2: Race/Ethnicity - ACS data 
+3: Education: five-year American Community Survey PUMS dataset 
+4: Marital Status: five-year American Community Survey PUMS dataset 
+5: Home Ownership: five-year American Community Survey PUMS dataset 
+6: Sex by Race/Ethnicity (collapsed categories)
+7: Race/Ethnicity by Age (collapsed categories) - 
+8: Phone Usage - Would require webscraping from National Center for Health Statistics
+
+
+**NHIS**
+
+```{r}
+NHIS_Adult_Phase1 <- readRDS("Phase0_NHIS_Adult.rds")
+NHIS_Child_Phase1 <- readRDS("Phase0_NHIS_Child.rds")
+```
+
+```{r}
+NHIS_Adult_Phase1 <- NHIS_Adult_Phase1 %>% rename(wtfa = 'WTFA_A') 
+NHIS_Child_Phase1 <- NHIS_Child_Phase1 %>% rename(wtfa = 'WTFA_C') 
+```
+
+
+```{r}
+NHIS_Adult_Survey_All <- svydesign(id= ~PPSU, 
+                                   strata = ~PSTRAT, 
+                                   nest = TRUE, 
+                                   weights = ~wtfa, 
+                                   data = NHIS_Adult_Phase1)
+```
+
+
+```{r}
+NHIS_Child_Survey_All <- svydesign(id= ~PPSU, 
+                                   strata = ~PSTRAT, 
+                                   nest = TRUE, 
+                                   weights = ~wtfa, 
+                                   data = NHIS_Child_Phase1)
+```
+
+
+**Household Pulse Survey**
+
+```{r}
+PulseSurvey_Wk1_Survey <- svydesign(id= ~PPSU, 
+                                   strata = ~PSTRAT, 
+                                   nest = TRUE, 
+                                   weights = ~wtfa, 
+                                   data = dfname)
+```
+
+
+
+
+
+
+
+
+```{r}
+Redlining <- readRDS("Redlining.rds")
+States <- readRDS("States_SpatialData.rds")
+```
+
+```{r}
+table(Redlining$MAX_state)
+northeast <- Redlining[Redlining@data$MAX_state %in% c( "MA", "RI", "CT", "NJ", "PA", "NY") , ]
+```
+
+```{r}
+northeast_states <- States[States@data$STATE %in% c(25, 44, 09, 34, 42, 36 ) , ]
+```
+
+
+

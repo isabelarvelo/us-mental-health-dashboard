@@ -1,0 +1,440 @@
+---
+title: "Phase 2 - Preliminary Viz"
+author: "Isabel Arvelo"
+date: "2022-10-11"
+output: html_document
+---
+
+#https://rpubs.com/mcchadreque/survey1
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(survey)
+library(ggsurvey)
+options(survey.lonely.psu = "certainty")
+```
+
+```{r}
+#Loading NSDUH Survey Objects 
+load("~/Desktop/Independent Study/PrelimApp/data/NSDUH_survey_adults.RData")
+#load("~/Desktop/Independent Study/NSDUH_survey.RData")
+```
+
+```{r}
+NSDUH_survey_adults_RC <- 
+    update( 
+        NSDUH_survey_adults , 
+        
+        one = 1 ,
+        
+        #PAST MONTH SERIOUS PSYCH DISTRESS INDICATOR
+        spdmon = 
+            factor( 
+                spdmon , 
+                levels = 0:1 , 
+                labels = c( "No", "Yes" )
+            ), 
+        #SERIOUS TGHT ABT KILL SLF 
+        MHSUTK_U= 
+            factor( 
+                MHSUTK_U, 
+                levels = 0:1 , 
+                labels = c( "No", "Yes" )
+            ),
+        
+        #ADULT MADE PLANS TO KILL SELF IN PAST YEAR
+         mhsuipln= 
+            factor( 
+                mhsuipln,
+                levels = 0:1 , 
+                labels = c( "No", "Yes" )
+            ),
+        
+        #ADULT ATTEMPTED TO KILL SELF IN PAST YEAR
+          mhsuitry= 
+            factor( 
+                mhsuitry,
+                levels = 0:1 , 
+                labels = c( "No", "Yes" )
+            ),    
+        
+        #CAT MENTAL ILLNESS INDICATOR 
+          MI_CAT_U= 
+            factor( 
+                MI_CAT_U,
+                levels = 0:3 , 
+                labels = c( "None", "Mild" , "Moderate", "Serious")
+            ),    
+        
+        #LIFETIME MAJOR DEPRESSIVE EPISODE (MDE)
+          amdelt= 
+            factor( 
+                amdelt,
+                levels = 1:2 , 
+                labels = c( "Yes", "No")
+            ),    
+        
+        #PAST YEAR MAJOR DEPRESSIVE EPISODE (MDE)
+          amdeyr= 
+            factor( 
+                amdeyr,
+                levels = 1:2 , 
+                labels = c( "Yes", "No")
+            ),            
+          
+       #RCVD TRT/CNSLG OR RX MED FOR DEPRESS FEELING IN PY      
+          amdetxrx= 
+            factor( 
+                amdetxrx,
+                levels = 0:1 , 
+                labels = c( "Yes", "No")
+            ),   
+       
+       #GENDER
+          irsex= 
+            factor( 
+                irsex,
+                levels = 1:2 , 
+                labels = c( "Male", "Female")
+            ),          
+       
+        #EDUCATION CATEGORIES
+          eduhighcat= 
+            factor( 
+                eduhighcat,
+                levels = 1:4 , 
+                labels = c( "Less high school", "High school grad", "Some coll/Assoc Dg", "College graduate")
+            ),    
+            
+          #MARITAL STATUS    
+           irmarit= 
+            factor( 
+                irmarit,
+                levels = c(1:4) , 
+                labels = c( "Married", "Widowed", "Divorced or Separated", "Never Been Married")
+            ),  
+       
+          #AGE CATEGORYS    
+           catage= 
+            factor( 
+                catage,
+                levels = c(2:4) , 
+                labels = c( "18-25", "26-34", "35 or Older")
+            ),     
+       
+          #MARITAL STATUS    
+           NEWRACE2= 
+            factor( 
+                NEWRACE2,
+                levels = c(1:7) , 
+                labels = c( "NonHisp White", "NonHisp Black/Afr Am", "NonHisp Native Am/AK Native",
+                            "NonHisp Native HI/Other Pac Isl", "NonHisp Asian", "NonHisp more than one race",
+                            "Hispanic")
+            ),   
+       
+          #EMPLOYMENT STATUS    
+           irwrkstat= 
+            factor( 
+                irwrkstat,
+                levels = c(1:4) , 
+                labels = c( "Employed full time", "Employed part time", "Unemployed",
+                            "Other")
+            ),  
+       
+          #TOTAL FAMILY INCOME   
+           income= 
+            factor( 
+                income,
+                levels = c(1:4) , 
+                labels = c( "Less than $20,000", "$20,000 - $49,999", "$50,000 - $74,999",
+                            "$75,000 or More")
+            ), 
+       
+          #POVERTY LEVEL (% OF US CENSUS POVERTY THRESHOLD)  
+           POVERTY3= 
+            factor( 
+                POVERTY3,
+                levels = c(1:3) , 
+                labels = c( "Living in Poverty", "Income Up to 2X Fed Pov Thresh", "Income More Than 2X Fed Pov
+                            Thresh")
+            )               
+        ) 
+
+```
+
+
+```{r}
+NSDUH_survey_adults_RC$variables  <- NSDUH_survey_adults_RC$variables %>%
+                                           rename(psych_distress_pm = K6SCMON, 
+                                                  worst_psych_distress_py = K6SCYR, 
+                                                  srs_psych_distress_pm = spdmon, 
+                                                  suicidal_thoughts = MHSUTK_U, 
+                                                  suicide_plan = mhsuipln, 
+                                                  suicide_attempt = mhsuitry,
+                                                  srs_mhi_prob = SMIPP_U, 
+                                                  mi_cat = MI_CAT_U, 
+                                                  lifetime_mde = amdelt, 
+                                                  mde_py = amdeyr ,
+                                                  trt_or_rx_MDE = amdetxrx, 
+                                                  gender = irsex, 
+                                                  education = eduhighcat, 
+                                                  marital_status = irmarit, 
+                                                  age = catage, 
+                                                  race = NEWRACE2, 
+                                                  employment = irwrkstat, 
+                                                  poverty_level = POVERTY3
+                                                  )
+```
+
+
+```{r}
+save(NSDUH_survey_adults_RC, file = "~/Desktop/Independent Study/PrelimApp/data/NSDUH_survey_adults_RC.RData")
+```
+
+```{r}
+load("~/Desktop/Independent Study/PrelimApp/data/BRFSS_survey_all.RData")
+```
+
+```{r}
+BRFSS_survey_all$variables <- BRFSS_survey_all$variables %>% mutate(dep_recode=recode(ADDEPEV3, 
+                         "1" = "1",
+                         "2"= "0", 
+                         "7" = "7", 
+                         "9" = "9"))
+
+```
+
+```{r}
+#Genhealth Overall 
+
+GH_O <- svyby(~GENHLTH, ~X_STATE, svymean, design = subset(BRFSS_survey_all, GENHLTH <7) )
+
+#GenHealth Race
+
+GH_Race <- svyby(~GENHLTH, ~X_STATE+ IMPRACE, svymean, design = subset(BRFSS_survey_all, GENHLTH <7) )
+
+GH_Race_split <- GH_Race %>%
+  group_by(IMPRACE)
+
+GH_Race_split<- group_split(GH_Race_split)
+
+#GenHealth Age
+
+GH_Age <- svyby(~GENHLTH, ~X_STATE+ AGE_G, svymean, design = subset(BRFSS_survey_all, GENHLTH <7) )
+
+GH_Age_split <- GH_Age %>%
+  group_by(AGE_G)
+
+GH_Age_split<- group_split(GH_Age_split)
+
+#GenHealth Health Insurance
+
+GH_HI <- svyby(~GENHLTH, ~X_STATE+ HLTHPLN, svymean, design = subset(BRFSS_survey_all, GENHLTH <7, HLTHPLN <9) )
+
+GH_HI_split <- GH_HI %>%
+  group_by(HLTHPLN)
+
+GH_HI_split<- group_split(GH_HI_split)
+
+#GenHealth Education
+
+GH_EDU <- svyby(~GENHLTH, ~X_STATE+ EDUCAG, svymean, design = subset(BRFSS_survey_all, GENHLTH <7, EDUCAG <5) )
+
+GH_EDU_split <- GH_EDU %>%
+  group_by(EDUCAG)
+
+GH_EDU_split<- group_split(GH_EDU_split)
+
+
+save(GH_O, file = "~/Desktop/Independent Study/PrelimApp/data/GH_O.RData")
+save(GH_Race_split, file = "~/Desktop/Independent Study/PrelimApp/data/GH_Race_split.RData")
+save(GH_Age_split, file = "~/Desktop/Independent Study/PrelimApp/data/GH_Age_split.RData")
+save(GH_HI_split, file = "~/Desktop/Independent Study/PrelimApp/data/GH_HI_split.RData")
+save(GH_EDU_split, file = "~/Desktop/Independent Study/PrelimApp/data/GH_EDU_split.RData")
+
+```
+
+```{r}
+
+```
+
+
+
+```{r}
+BRFSS_survey_all <- 
+    update( 
+        BRFSS_survey_all , 
+        
+        one = 1 ,
+        
+        IMPRACE = 
+            factor( 
+                IMPRACE, 
+                levels = 1:6 
+            ), 
+        
+          EDUCAG= 
+            factor( 
+                EDUCAG, 
+                levels = 1:4
+            )
+    )
+```
+
+```{r}
+gh_edu_table <- svytable(
+        as.formula(~EDUCAG),
+        design = subset(BRFSS_survey_all, GENHLTH <7, EDUCAG <5) 
+    )
+
+rownames(gh_edu_table) <- c(
+          "Did not graduate High School",
+          "Graduated High School",
+          "Attended College or Technical School",
+          "Graduated from College or Technical School"
+        )
+
+
+gh_age_table <- svytable(
+        as.formula(~AGE_G ),
+        design = subset(BRFSS_survey_all,GENHLTH <7) 
+    )
+
+rownames(gh_age_table) <-  c(
+          "Age 18 to 24",
+          "Age 25 to 34",
+          "Age 35 to 44",
+          "Age 45 to 54",
+          "Age 55 to 64",
+          "Age 65 or older"
+        )
+
+gh_HI_table <- svytable(
+        as.formula(~HLTHPLN),
+        design = subset(BRFSS_survey_all,GENHLTH <7, HLTHPLN <9) 
+    )
+
+rownames(gh_HI_table) <- c(
+    "Have some form of insurance",
+    "Do not have some form of health insurance",
+    "Don´t know, refused or missing insurance response"
+)
+
+gh_race_table <- svytable(
+        as.formula(~IMPRACE),
+        design = subset(BRFSS_survey_all,GENHLTH <7, HLTHPLN <9) 
+    )
+
+rownames(gh_race_table) <- c(
+          "White, Non-Hispanic",
+          "Black, Non-Hispanic",
+          "Asian, Non-Hispanic",
+          "AI/AN, Non-Hispanic",
+          "Hispanic",
+          "Other Race"
+        )
+```
+
+```{r}
+save(gh_edu_table , file = "~/Desktop/Independent Study/PrelimApp/data/gh_edu_table.RData")
+save(gh_age_table, file = "~/Desktop/Independent Study/PrelimApp/data/gh_age_table.RData")
+save(gh_HI_table, file = "~/Desktop/Independent Study/PrelimApp/data/gh_HI_table.RData")
+save(gh_race_table, file = "~/Desktop/Independent Study/PrelimApp/data/gh_race_table.RData")
+```
+
+
+
+```{r}
+#Recoded Depression Variable 
+
+Dep_O <- svyby(~dep_recode, ~X_STATE, svymean, design = subset(BRFSS_survey_all, dep_recode <3) )
+
+
+#Dep Age
+
+Dep_Age <- svyby(~dep_recode, ~X_STATE+ AGE_G, svymean, design = subset(BRFSS_survey_all,dep_recode <3) )
+
+Dep_Age_split <- Dep_Age %>%
+  group_by(AGE_G)
+
+Dep_Age_split<- group_split(Dep_Age_split)
+
+#Dep Health Insurance
+
+Dep_HI <- svyby(~dep_recode, ~X_STATE+ HLTHPLN, svymean, design = subset(BRFSS_survey_all,dep_recode <3, HLTHPLN <9) )
+
+Dep_HI_split <- Dep_HI %>%
+  group_by(HLTHPLN)
+
+Dep_HI_split<- group_split(Dep_HI_split)
+
+#Dep Education
+
+Dep_EDU <- svyby(~dep_recode, ~X_STATE+ EDUCAG, svymean, design = subset(BRFSS_survey_all,dep_recode <3, EDUCAG <9) )
+
+Dep_EDU_split <- Dep_EDU %>%
+  group_by(EDUCAG)
+
+Dep_EDU_split<- group_split(Dep_EDU_split)
+
+save(Dep_O, file = "~/Desktop/Independent Study/PrelimApp/data/Dep_O.RData")
+save(Dep_Age_split, file = "~/Desktop/Independent Study/PrelimApp/data/Dep_Age_split.RData")
+save(Dep_HI_split, file = "~/Desktop/Independent Study/PrelimApp/data/Dep_HI_split.RData")
+save(Dep_EDU_split, file = "~/Desktop/Independent Study/PrelimApp/data/Dep_EDU_split.RData")
+
+save(BRFSS_survey_all, file = "~/Desktop/Independent Study/PrelimApp/data/BRFSS_survey_all.RData")
+```
+```{r}
+dep_edu_table <- svytable(
+        as.formula(~EDUCAG),
+        design = subset(BRFSS_survey_all,dep_recode <3, EDUCAG <5) 
+    )
+
+rownames(dep_edu_table) <- c(
+          "Did not graduate High School",
+          "Graduated High School",
+          "Attended College or Technical School",
+          "Graduated from College or Technical School"
+        )
+
+
+dep_age_table <- svytable(
+        as.formula(~AGE_G ),
+        design = subset(BRFSS_survey_all,dep_recode <3) 
+    )
+
+rownames(dep_age_table) <-  c(
+          "Age 18 to 24",
+          "Age 25 to 34",
+          "Age 35 to 44",
+          "Age 45 to 54",
+          "Age 55 to 64",
+          "Age 65 or older"
+        )
+
+dep_HI_table <- svytable(
+        as.formula(~HLTHPLN),
+        design = subset(BRFSS_survey_all,dep_recode <3, HLTHPLN <9) 
+    )
+
+rownames(dep_HI_table) <- c(
+    "Have some form of insurance",
+    "Do not have some form of health insurance",
+    "Don´t know, refused or missing insurance response"
+)
+
+```
+
+```{r}
+save(dep_edu_table , file = "~/Desktop/Independent Study/PrelimApp/data/dep_edu_table .RData")
+save(dep_age_table, file = "~/Desktop/Independent Study/PrelimApp/data/dep_age_table.RData")
+save(dep_HI_table, file = "~/Desktop/Independent Study/PrelimApp/data/dep_HI_table.RData")
+```
+
+
+=
+
+
+
+
+

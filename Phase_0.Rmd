@@ -1,0 +1,365 @@
+---
+title: "Phase 0"
+author: "Isabel Arvelo"
+date: "2022-09-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(haven)
+library(pander)
+library(knitr)
+library(tidyverse)
+library(geojsonio)
+library(leaflet)
+```
+
+
+National Survey on Drug Use and Health (NSDUH) 
+
+```{r}
+NSDUH <- load("~/Desktop/Independent Study/Original Data/NSDUH_2020.Rdata")
+```
+
+```{r}
+filtered_NSDUH <-
+  NSDUH_2020  %>% select(
+    QUESTID2,
+    ANALWTQ1Q4_C,
+    K6SCMON,
+    K6SCYR,
+    spdmon,
+    MHSUTK_U,
+    mhsuipln,
+    mhsuitry,
+    SMIPP_U,
+    MI_CAT_U,
+    amdelt,
+    amdeyr,
+    amdetxrx,
+    booked,
+    irsex,
+    eduhighcat,
+    irmarit,
+    catage,
+    NEWRACE2,
+    irwrkstat,
+    income,
+    POVERTY3,
+    VESTRQ1Q4_C,
+    verep
+  )
+```
+
+```{r}
+saveRDS(filtered_NSDUH, file="Phase0_NSDUH.rds")
+```
+
+
+
+
+National Health Interview Survey 
+```{r}
+NHIS_children <- read.csv('~/Desktop/Independent Study/Original Data/NHIS/child21.csv', stringsAsFactors=FALSE)
+NHIS_adults <- read.csv('~/Desktop/Independent Study/Original Data/NHIS/adult21.csv', stringsAsFactors=FALSE)
+```
+
+```{r}
+filtered_NHIS_Adult <-
+  NHIS_adults %>% select(
+    WTFA_A,
+    SEX_A,
+    EDUCP_A,
+    HISPALLP_A,
+    PHSTAT_A,
+    LSATIS11R_A,
+    NOTCOV_A,
+    ANXFREQ_A,
+    ANXMED_A,
+    DEPMED_A,
+    MHTHRPY_A,
+    K6SPD_A,
+    SUPPORT_A,
+    ORIENT_A,
+    MARITAL_A,
+    AFVET_A,
+    EMPWRKLSW1_A,
+    RATCAT_A,
+    FDSCAT4_A,
+    PPSU,
+    PSTRAT
+  )
+```
+
+```{r}
+filtered_NHIS_Child <-
+  NHIS_children %>% select(
+    WTFA_C,
+    SEX_C,
+    MAXEDUCP_C,
+    SCHSPEDEV_C,
+    HISPALLP_C,
+    PHSTAT_C,
+    LSATIS11_C,
+    NOTCOV_C,
+    ANXFREQ_C,
+    MHRX_C,
+    MHTHRPY_C,
+    SUPPORT_C,
+    RATCAT_C,
+    FDSCAT4_C,
+    PPSU,
+    PSTRAT
+  )
+```
+
+```{r}
+saveRDS(filtered_NHIS_Adult, file="Phase0_NHIS_Adult.rds")
+saveRDS(filtered_NHIS_Child, file="Phase0_NHIS_Child.rds")
+```
+
+
+
+BRFSS Survey Data 
+
+```{r}
+BRFSS_Survey <- read_xpt('~/Desktop/Independent Study/Original Data/LLCP2021.XPT')
+```
+
+```{r}
+filtered_BRFSS <-
+  BRFSS_Survey %>% select(
+    "_LLCPWT",
+    GENHLTH,
+    MENTHLTH,
+    PRIMINSR,
+    PERSDOC3,
+    ADDEPEV3,
+    MARITAL,
+    EDUCA,
+    VETERAN3,
+    EMPLOY1,
+    INCOME3,
+    ACEDEPRS,
+    ACEPRISN,
+    ACEDIVRC,
+    SOMALE,
+    SOFEMALE,
+    TRNSGNDR,
+    "_MENT14D",
+    "_HLTHPLN",
+    "_RACE",
+    "_AGE_G",
+    "_EDUCAG",
+    "_INCOMG1",
+    "_RFDRHV7",
+    "_CLLCPWT",
+    "_STSTR",
+    "_PSU",
+    "_STRWT" ,
+    "_LLCPWT2",
+    "STATERE1",
+    "_STATE",
+    "_RAWRAKE",
+    "_WT2RAKE",
+    "_IMPRACE"
+  )
+```
+
+```{r}
+saveRDS(filtered_BRFSS, file = "Phase0_BRFSS_Survey.rds")
+```
+
+
+National Mental Health Services 
+
+```{r}
+NMHSS <- read.csv("~/Desktop/Independent Study/Original Data/SAMHSA/nmhss-2020.csv")
+```
+
+```{r}
+filtered_NMHSS <- NMHSS %>% select(LST, MHINTAKE, MHREFERRAL, TREATMT, SETTINGIP, SETTINGOP, FACILITYTYPE, FOCUS, OWNERSHP, MHCHRONIC, YNGCHLD, CHILDREN, ADOLES, YOUNGADULTS, SETTINGRC, SETTINGDTPH, REVCHK2, REVCHK10, REVCHK15, IPBEDS, RCBEDS)
+```
+
+```{r}
+saveRDS(filtered_BRFSS, file = "Phase0_NMHSS.rds")
+```
+
+
+Mental Health Client Level Data 
+
+```{r}
+mhcld.2019 <- read.csv("~/Desktop/Independent Study/Original Data/SAMHSA/mhcld-2019.csv")
+```
+
+```{r}
+filtered_MHCLD <- mhcld.2019 %>% select(MH1, MH2, MH3, SUB, SAP, SMISED, GENDER, AGE, EDUC, RACE, ETHNIC, MARSTAT)
+```
+
+```{r}
+saveRDS(filtered_MHCLD , file = "Phase0_MHCLD.rds")
+```
+
+
+Household Pulse Survey 
+
+```{r}
+PS_A_D <- read.csv("~/Desktop/Independent Study/Original Data/PS_A_D.csv")
+PS_HI <- read.csv("~/Desktop/Independent Study/Original Data/PS_HI.csv")
+PS_MHC <- read.csv("~/Desktop/Independent Study/Original Data/PS_MHC.csv")
+```
+
+```{r}
+filtered_PS_A_D <- PS_A_D %>% select(Phase, Indicator, Group, State, Subgroup, Value, Low.CI, High.CI, Time.Period , 
+                                     Time.Period.Label,  Time.Period.Start.Date)
+```
+
+```{r}
+filtered_PS_HI <- PS_HI %>% select(Phase, Indicator, Group, State, Subgroup, Value, Low.CI, High.CI, Time.Period , 
+                                     Time.Period.Label,  Time.Period.Start.Date)
+```
+
+```{r}
+filtered_PS_MHC <- PS_MHC %>% select(Phase, Indicator, Group, State, Subgroup, Value, LowCI, HighCI, Time.Period , 
+                                     Time.Period.Label,  Time.Period.Start.Date)
+```
+
+```{r}
+saveRDS(filtered_PS_A_D, file = "Phase0_PS_A_D.rds")
+```
+
+```{r}
+saveRDS(filtered_PS_HI, file = "Phase0_PS_HI.rds")
+```
+
+```{r}
+saveRDS(filtered_PS_MHC, file = "Phase0_PS_MHC.rds")
+```
+
+
+Geospatial Data
+
+```{r}
+suUS_States <- geojson_read("~/Desktop/Independent Study/Original Data/US_States.json",  what = "sp")
+```
+
+
+```{r}
+suUS_States <- geojson_read("~/Desktop/Independent Study/Original Data/US_States.json",  what = "sp")
+
+State_FIPS<- read.csv("~/Desktop/Independent Study/Original Data/Census State FIPS Codes.csv")
+```
+
+```{r}
+saveRDS(suUS_States, file = "States_SpatialData.rds")
+saveRDS(State_FIPS, file = "States_FIPSData.rds")
+```
+
+```{r}
+HOLC_Areas  <- geojson_read("~/Desktop/Independent Study/Original Data/Tracts_2020_HOLC.geojson",  what = "sp")
+```
+
+```{r}
+saveRDS(HOLC_Areas, file = "Redlining.rds")
+```
+
+
+
+Urban Institute Household Pulse Survey PUF Files
+
+```{r}
+PS_rolling_avgs <- read.csv("~/Desktop/Independent Study/Original Data/rolling_all_to_current_week.csv")
+pulse_puf_most_recent <- read.csv("~/Desktop/Independent Study/Original Data/pulse_puf_most_recent.csv")
+```
+
+```{r}
+PSavgs <- PS_rolling_avgs %>% filter(metric %in% c("depression_anxiety_signs", "uninsured", "insured_public" ))
+```
+
+```{r}
+pulse_avg_pweights <- pulse_puf_most_recent %>% select( c(1, 121:200) )
+
+pulseavg <- pulse_puf_most_recent %>% select("scram",  "week_x" ,"est_st", "est_msa", "pweight" , "tbirth_year",
+                                             "abirth_year","egender" ,  "agender", "rhispanic" , "ahispanic" ,
+                                             "rrace", "arace","eeduc", "aeduc", "ms", "worry_score",
+                                             "interest_score", "down_score","anxiety_signs", "depression_signs" ,
+                                             "depression_anxiety_signs", "week_num","state" , "hlthstatus",
+                                             "anxious","worry" , "interest",  "down", "hisp_rrace", "hlthins1",
+                                             "hlthins2", "hlthins3", "hlthins4", "hlthins5", "hlthins6", "hlthins7", 
+                                             "hlthins8")
+PS_recent <-  left_join(pulseavg, pulse_avg_pweights , by = c("scram" = "scram"))
+```
+
+```{r}
+saveRDS(pulse_avg_pweights, file = "Pulse_RollingAvg.rds")
+saveRDS(PS_recent, file = "PS_Phase1.rds")
+```
+
+
+Wireless state data for raking BRFSS data 
+
+```{r}
+library(pdftools)
+library(tidyverse)
+```
+
+```{r}
+tt <- pdf_text("~/Desktop/Independent Study/Original Data/Wireless_state_202108-508.pdf")
+ll <- strsplit(tt, split="\n")
+```
+
+```{r}
+ll_personalphone <- ll[[1]] 
+ll_householdphone <- ll[[3]]
+```
+
+```{r}
+ll1.header <- grep("Geographic", ll_householdphone)
+ll1.end <- grep("Wyoming", ll_householdphone)
+ll_householdphone <- ll_householdphone[c((ll1.header+2):ll1.end)]
+
+ll2.header <- grep("Geographic", ll_personalphone)
+ll2.end <- grep("Wyoming", ll_personalphone)
+ll_personalphone <- ll_personalphone[c((ll2.header+2):ll2.end)]
+
+```
+
+
+```{r}
+unlisted_hh <- unlist(strsplit(ll_householdphone, "    "))
+unlisted_pp <- unlist(strsplit(ll_personalphone, "    "))
+
+entries_hh <- unlisted_hh[unlisted_hh!= ""]
+entries_pp <- unlisted_pp[unlisted_pp!= ""]
+
+col1_index <- seq(1,300,6)
+col2_index<- col1_index + 1
+col3_index <- col1_index + 2
+col4_index <- col1_index + 3
+col5_index <- col1_index + 4
+col6_index <- col1_index + 5
+```
+
+
+```{r}
+Geographic_area <- entries_hh[col1_index]
+Wireless_only <- entries_hh[col2_index] 
+Wireless_and_landline <- entries_hh[col3_index] 
+Landline_only <- entries_hh[col4_index] 
+No_telephone_service <- entries_hh[col5_index] 
+Total <- entries_hh[col6_index] 
+
+fulldf_hh <- data.frame(Geographic_area, Wireless_only, Wireless_and_landline , Landline_only, No_telephone_service, Total )
+```
+
+```{r}
+Geographic_area <- entries_pp[col1_index]
+Wireless_only <- entries_pp[col2_index] 
+Wireless_and_landline <- entries_pp[col3_index] 
+Landline_only <- entries_pp[col4_index] 
+No_telephone_service <- entries_pp[col5_index] 
+Total <- entries_pp[col6_index] 
+
+fulldf_pp <- data.frame(Geographic_area, Wireless_only, Wireless_and_landline , Landline_only, No_telephone_service, Total )
+```
+
